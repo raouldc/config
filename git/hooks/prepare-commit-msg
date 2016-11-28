@@ -1,0 +1,7 @@
+#!/bin/bash
+# Adds PP-{JIRA Ticket number}: to commit messages
+
+if [ x = x${2} ]; then
+   COMMIT_PREFIX=$(git rev-parse --abbrev-ref HEAD | grep -o 'PP\-[0-9]*')
+   sed -i "1s/^/$COMMIT_PREFIX \n/" "$1"
+fi

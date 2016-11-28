@@ -1,0 +1,22 @@
+#!/bin/sh
+
+commit_regex='(PP-[0-9]+|fixup!)'
+error_msg="Aborting commit. Your commit message is missing a JIRA ticket ('PP-1234')"
+
+
+if ! grep -iqE "$commit_regex" "$1";
+then
+    echo "$error_msg" >&2
+    exit 1
+fi
+
+
+current_branch="$(git rev-parse --abbrev-ref HEAD)"
+current_branch_ticket="$(echo $current_branch | grep -P 'PP-[0-9]+' -o)"
+commit_matches_branch_regex="($current_branch_ticket|fixup!)"
+
+if ! grep -iqE "$commit_matches_branch_regex" "$1";
+then
+    echo "your JIRA ticket number doesn't match the branch name" >&2
+    exit 1
+fi
