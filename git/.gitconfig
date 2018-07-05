@@ -1,28 +1,59 @@
-[difftool "sourcetree"]
-	cmd = 'C:/Program Files/Beyond Compare 4/BComp.exe' \"$LOCAL\" \"$REMOTE\"
-[mergetool "sourcetree"]
-	cmd = 'C:/Program Files/Beyond Compare 4/BComp.exe' \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\"
-	trustExitCode = true
-[user]
-	email = raoul.dcunha@pushpay.com
-	name = Raoul D'Cunha
-[credential]
-	helper = manager
-	modalprompt = true
 [diff]
 	tool = bc3
-	guitool = kdiff3
-[difftool]
-	prompt = false
-[difftool "bc3"]
-	cmd = 'C:/Program Files/Beyond Compare 4/BComp.exe' \"$LOCAL\" \"$REMOTE\"
 [merge]
 	tool = bc3
 [mergetool]
-	prompt = false
-[mergetool "bc3"]
-	trustExitCode = true
-	keepBackup = false
-	cmd = \"c:/program files/beyond compare 4/bcomp.exe\" "$LOCAL" "$REMOTE" "$BASE" "$MERGED"
+	bc3 = trustExitCode
 [core]
-	editor = nano
+	excludesfile = /Users/raoul/.gitignore_global
+[push]
+    	default = current
+[color]
+    	ui = true
+[branch]
+    	autosetuprebase = always
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+[user]
+	name = Raoul D'Cunha
+	email = raoul.dcunha@pushpay.com
+[commit]
+	template = /Users/raoul/.stCommitMsg
+[credential]
+	helper = !/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home/jre/bin/java -Ddebug=false -Djava.net.useSystemProxies=true -jar /usr/local/Cellar/git-credential-manager/2.0.3/libexec/git-credential-manager-2.0.3.jar
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[alias]
+	l = log --pretty=format:%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn] --decorate --date=short
+	lg = log --oneline --decorate --all --graph      # Log Graph
+	a = add
+	ap = add -p                                      # Add Parts
+	s = status -s
+	c = commit --verbose
+	co = checkout
+	cob = checkout -b                                # CheckOut Branch
+	la = !git config -l | grep alias | cut -c 7-     # List Aliases
+	up = push -u origin HEAD                         # "get up, get on up"
+	pushit = push -u origin HEAD --force-with-lease  # "push it real good!"
+	ec = config --global --edit                      # Edit global git Config
+	upd = !git pull --rebase --prune $@ && git submodule update --init --recursive
+	cm = !git add -A && git commit --verbose         # Commit all with Message
+	save = !git add -A && git commit -m 'SAVEPOINT'
+	wip = !git add -u && git commit -m 'WIP' 
+	undo = reset HEAD~1 --mixed
+	amend = commit -a --amend
+	wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
+	bclean = "!f() { git branch --merged ${1-master} | grep -v " ${1-master}$" | xargs -I git branch -d; }; f"
+	bdone = "!f() { git checkout ${1-master} && git upd && git bclean ${1-master}; }; f"
+	open = "!f() { REPO_URL=$(git config remote.origin.url); explorer ${REPO_URL%%.git}; }; f" # open github page on windows
+	#open = "!f() { REPO_URL=$(git config remote.origin.url); open ${REPO_URL%%.git}; }; f"] # open github page on mac
+	browse = !git open
+	migrate = "!f(){ CURRENT=$(git symbolic-ref --short HEAD); git checkout -b $1 && git branch --force $CURRENT ${3-'$CURRENT@{u}'} && git rebase --onto ${2-master} $CURRENT; }; f"
+	optimise = "!git remote prune origin && git bclean && git prune"
